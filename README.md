@@ -1,5 +1,5 @@
-# machybris_samples - (C) by mac-l1
-samples of how to use machybris in your code - for sharing and study purposes;
+# machybris_examples - (C) by mac-l1
+examples of how to use machybris in your code - for sharing and study purposes;
 these include demo's for androids EGL/GLES and rockchips VPU support in linux
 
 **if you like this, please [donate]( https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=KKWC6YE6G5EZU&item_name=mac_l1&item_number=mac_l1)**
