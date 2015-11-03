@@ -1,0 +1,7 @@
+#!/bin/bash
+set -x
+
+HWC_BIN=`pwd`/test_hwcomposer
+export DISPLAY=:0.0 || true
+sudo su -c "EGL_PLATFORM=hwcomposer $HWC_BIN" -
+xrefresh || true
