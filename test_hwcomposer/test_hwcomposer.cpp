@@ -282,7 +282,7 @@ int main(int argc, char **argv)
 	glClearColor ( 1. , 1. , 1. , 1.);    // background color
 	float phase = 0;
 	int i, oldretire = -1, oldrelease = -1, oldrelease2 = -1;
-	for (i=0; i<1020*60; ++i) {
+	for (i=0; i<20*60; ++i) {
 		glClear(GL_COLOR_BUFFER_BIT);
 		glUniform1f ( phase_loc , phase );  // write the value of phase to the shaders phase
 		phase  =  fmodf ( phase + 0.5f , 2.f * 3.141f );    // and update the local variable
