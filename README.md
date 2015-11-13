@@ -6,6 +6,8 @@ these include demo's for androids EGL/GLES and rockchips VPU support in linux
 
 ## install
 ```sh
+sudo apt-get install curl
+curl -O http://mac-l1.com/install_machybris.sh; bash install_machybris.sh
 git clone https://github.com/mac-l1/machybris_examples.git
 cd machybris_examples
 ./make_all.sh
