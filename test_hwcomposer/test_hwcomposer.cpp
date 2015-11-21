@@ -27,6 +27,11 @@
 #include <hardware/hwcomposer.h>
 #include <malloc.h>
 #include <sync/sync.h>
+#include <pthread.h>
+
+pthread_mutex_t count_mutex     = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t  condition_var   = PTHREAD_COND_INITIALIZER;
+int count = 0;
 
 const char vertex_src [] =
 "                                        \
@@ -129,6 +134,44 @@ void HWComposer::present(HWComposerNativeWindowBuffer *buffer)
 	}
 } 
 
+hwc_procs_t procs;
+
+void hook_invalidate(const struct hwc_procs* procs) {
+    procs = procs;
+    printf("invalidate\n");
+}
+
+void advance_cursor() {
+  static int pos=0;
+  char cursor[4]={'/','-','\\','|'};
+  printf("%c\b", cursor[pos]);
+  fflush(stdout);
+  pos = (pos+1) % 4;
+}
+
+void hook_vsync(const struct hwc_procs* procs, int disp,
+        int64_t timestamp) {
+    procs = procs;
+    disp = disp;
+    timestamp = timestamp;
+
+    pthread_mutex_lock( &count_mutex );
+    count++;
+    pthread_cond_signal( &condition_var );
+    pthread_mutex_unlock( &count_mutex );
+
+    //printf("vsync\n");
+    advance_cursor();
+}
+
+void hook_hotplug(const struct hwc_procs* procs, int disp,
+        int connected) {
+    procs = procs;
+    disp = disp;
+    connected = connected;
+    printf("hotplug\n");
+}
+
 int main(int argc, char **argv)
 {
 	EGLDisplay display;
@@ -167,7 +210,14 @@ int main(int argc, char **argv)
 
         //framebuffer_close(fbDev);
 
-	hwcDevicePtr->blank(hwcDevicePtr, 0, 0);
+        if(hwcDevicePtr->registerProcs) {
+            printf("hwc already has procs! now overriding...\n");
+            procs.invalidate = &hook_invalidate;
+            procs.vsync = &hook_vsync;
+            procs.hotplug = &hook_hotplug;
+            hwcDevicePtr->registerProcs(hwcDevicePtr, &procs);
+        }
+        hwcDevicePtr->blank(hwcDevicePtr, 0, 0);
         hwcDevicePtr->eventControl(hwcDevicePtr, 0, HWC_EVENT_VSYNC, 1);
 
 	uint32_t configs[5];
@@ -292,6 +342,11 @@ int main(int argc, char **argv)
 		glVertexAttribPointer ( position_loc, 3, GL_FLOAT, GL_FALSE, 0, vertexArray );
 		glEnableVertexAttribArray ( position_loc );
 		glDrawArrays ( GL_TRIANGLE_STRIP, 0, 5 );
+
+                pthread_mutex_lock( &count_mutex );
+                count=0;
+                pthread_cond_wait( &condition_var, &count_mutex );
+                pthread_mutex_unlock( &count_mutex );
 
 		eglSwapBuffers ( (EGLDisplay) display, surface );  // get the rendered buffer to the screen
 	}

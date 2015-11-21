@@ -25,6 +25,11 @@
 #include <hardware/hwcomposer.h>
 #include <malloc.h>
 #include <sync/sync.h>
+#include <pthread.h>
+
+pthread_mutex_t count_mutex     = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t  condition_var   = PTHREAD_COND_INITIALIZER;
+int count = 0;
 
 class HWComposer : public HWComposerNativeWindow
 {
@@ -68,6 +73,45 @@ void HWComposer::present(HWComposerNativeWindowBuffer *buffer)
 		close(oldretire);
 	}
 } 
+
+
+hwc_procs_t procs;
+
+void hook_invalidate(const struct hwc_procs* procs) {
+    procs = procs;
+    printf("invalidate\n");
+}
+
+void advance_cursor() {
+  static int pos=0;
+  char cursor[4]={'/','-','\\','|'};
+  printf("%c\b", cursor[pos]);
+  fflush(stdout);
+  pos = (pos+1) % 4;
+}
+
+void hook_vsync(const struct hwc_procs* procs, int disp,
+        int64_t timestamp) {
+    procs = procs;
+    disp = disp;
+    timestamp = timestamp;
+
+    pthread_mutex_lock( &count_mutex );
+    count++;
+    pthread_cond_signal( &condition_var );
+    pthread_mutex_unlock( &count_mutex );
+
+    //printf("vsync\n");
+    advance_cursor();
+}
+
+void hook_hotplug(const struct hwc_procs* procs, int disp,
+        int connected) {
+    procs = procs;
+    disp = disp;
+    connected = connected;
+    printf("hotplug\n");
+}
 
 namespace MaliSDK
 {
@@ -115,7 +159,14 @@ namespace MaliSDK
 
         //framebuffer_close(fbDev);
 
-	hwcDevicePtr->blank(hwcDevicePtr, 0, 0);
+        if(hwcDevicePtr->registerProcs) {
+            printf("hwc already has procs! now overriding...\n");
+            procs.invalidate = &hook_invalidate;
+            procs.vsync = &hook_vsync;
+            procs.hotplug = &hook_hotplug;
+            hwcDevicePtr->registerProcs(hwcDevicePtr, &procs);
+        }
+        hwcDevicePtr->blank(hwcDevicePtr, 0, 0);
         hwcDevicePtr->eventControl(hwcDevicePtr, 0, HWC_EVENT_VSYNC, 1);
 
 	uint32_t configs[5];
@@ -216,4 +267,13 @@ namespace MaliSDK
         eglDestroySurface(display, surface);
         eglTerminate(display);
     }
+
+    void EGLRuntime::waitForVSYNC(void)
+    {
+        pthread_mutex_lock( &count_mutex );
+        count=0;
+        pthread_cond_wait( &condition_var, &count_mutex );
+        pthread_mutex_unlock( &count_mutex );
+    }
+
 }

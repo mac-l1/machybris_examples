@@ -123,6 +123,8 @@ namespace MaliSDK
          * \brief Shuts down EGL.
          */
         static void terminateEGL(void);
+
+        static void waitForVSYNC(void);
     };
 }
 

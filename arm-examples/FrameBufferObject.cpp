@@ -455,6 +455,7 @@ int main(void)
          * Push the EGL surface color buffer to the native window.
          * Causes the rendered graphics to be displayed on screen.
          */
+        EGLRuntime::waitForVSYNC();
         eglSwapBuffers(EGLRuntime::display, EGLRuntime::surface);
     }
 

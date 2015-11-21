@@ -90,7 +90,9 @@ src/EGLRuntime.o: /usr/include/_G_config.h /usr/include/wchar.h
 src/EGLRuntime.o: /usr/include/math.h
 src/EGLRuntime.o: /usr/local/include/android/hardware/hwcomposer.h
 src/EGLRuntime.o: /usr/local/include/android/hardware/hwcomposer_defs.h
-src/EGLRuntime.o: /usr/include/malloc.h
+src/EGLRuntime.o: /usr/include/malloc.h /usr/include/pthread.h
+src/EGLRuntime.o: /usr/include/endian.h /usr/include/sched.h
+src/EGLRuntime.o: /usr/include/time.h
 src/ETCHeader.o: ./inc/ETCHeader.h
 src/HDRImage.o: ./inc/HDRImage.h ./inc/Platform.h
 src/HDRImage.o: /usr/local/include/hybris/hwcomposerwindow/hwcomposer_window.h

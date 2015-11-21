@@ -4,6 +4,8 @@ set -x # verbose
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 cd $SCRIPT_DIR
 
+sudo apt-get install -y --force-yes build-essential xutils-dev git autoconf libtool pkg-config
+
 cd test_vpu
 ./make.sh $@
 cd $SCRIPT_DIR
