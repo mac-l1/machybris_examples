@@ -1350,6 +1350,8 @@ void nonblock(int state)
 }
 
 int main(int argc, char *argv[]) {
+    machybris_init(argc,argv);
+
     output = OUTPUT_DISPLAY; // assume fd
     half = false;
     if(argc == 2) {
