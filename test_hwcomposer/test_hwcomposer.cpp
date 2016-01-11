@@ -174,6 +174,8 @@ void hook_hotplug(const struct hwc_procs* procs, int disp,
 
 int main(int argc, char **argv)
 {
+        machybris_init(argc, argv);
+
 	EGLDisplay display;
 	EGLConfig ecfg;
 	EGLint num_config;
