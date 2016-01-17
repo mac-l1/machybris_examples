@@ -242,8 +242,10 @@ void renderFrame(void)
     if(angleZoom < 0) angleZoom += 360;
 }
 
-int main(void)
+int main(int argc,char** argv)
 {
+    machybris_init(argc,argv);
+
     /* Intialize the Platform object for platform specific functions. */
     Platform* platform = Platform::getInstance();
 
@@ -287,7 +289,7 @@ int main(void)
          * Push the EGL surface color buffer to the native window.
          * Causes the rendered graphics to be displayed on screen.
          */
-        EGLRuntime::waitForVSYNC();
+        //EGLRuntime::waitForVSYNC();
         eglSwapBuffers(EGLRuntime::display, EGLRuntime::surface);
     }
 
