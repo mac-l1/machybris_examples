@@ -30,6 +30,7 @@ using namespace mindroid;
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
+#define OMX_ON2_VIDEO_CodingHEVC OMX_RK_VIDEO_CodingHEVC // mac-l1 quickfix compile error with machybris v0.1.2
 #include <android/libon2/vpu_api.h>
 
 extern "C" {
